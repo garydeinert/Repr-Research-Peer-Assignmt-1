@@ -16,12 +16,31 @@ my.dataframe <- read.csv("activity.csv",header = TRUE)
 
 ```{r}
       dayTotal <- aggregate(my.dataframe$steps, list(Date = my.dataframe$date), sum)
-      dayMean <- format(mean(dayTotal$x, na.rm = TRUE), nsmall = 3)
-      dayMedian <- format(median(dayTotal$x, na.rm = TRUE), nsmall = 3)
+      dayMean <- format(mean(dayTotal$x, na.rm = TRUE), nsmall = 2)
+      dayMedian <- median(dayTotal$x, na.rm = TRUE)
 
 hist(dayTotal$x, main = "Histogram of Daily Walking Totals", xlab = "Daily Steps per Day")
 
 ```
 
-***  __The average number of steps per day is `r dayMean` and the median number of steps per day is `r dayMedian`.__
+***  __The average number of steps per day is `r dayMean` and the median number of steps per day is `r dayMedian`.__   
+  
 
+### Part 3.  What is the average daily activity pattern?  
+
+```{r}
+myAvgs <- aggregate(my.dataframe$steps, 
+            list(Interval = my.dataframe$interval), 
+            mean, 
+            na.rm = TRUE)
+maxInt <- subset(myAvgs,x == max(myAvgs$x))            ##  Find the maximum average time interval 
+
+plot(myAvgs$Interval, myAvgs$x, 
+      type = "l",
+      main = "Number of Steps per Daily Time Interval", 
+      xlab = "Time Interval During Day",
+      ylab = "Steps")
+
+```
+   
+*** __The maximum average daily steps was in time interval `r maxInt$Interval` with `r format(maxInt$x, digits = 2, nsmall = 2)` average steps.__   
