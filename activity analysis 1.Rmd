@@ -1,0 +1,27 @@
+---
+title: "Peer Assessment 1 - Reproducible Research"
+author: "Gary W. Deinert"
+date: "Saturday, April 18, 2015"
+output: html_document
+---
+
+### Part 1.  Loading and preprocessing the data.  
+
+```{r}
+setwd("//GARY-LAPTOP/Users/Gary/Desktop/Data Science Specialzation/Repr Research Peer Assignmt 1")
+my.dataframe <- read.csv("activity.csv",header = TRUE)
+
+```
+### Part 2.  What is the mean total number of steps taken per day? 
+
+```{r}
+      dayTotal <- aggregate(my.dataframe$steps, list(Date = my.dataframe$date), sum)
+      dayMean <- format(mean(dayTotal$x, na.rm = TRUE), nsmall = 3)
+      dayMedian <- format(median(dayTotal$x, na.rm = TRUE), nsmall = 3)
+
+hist(dayTotal$x, main = "Histogram of Daily Walking Totals", xlab = "Daily Steps per Day")
+
+```
+
+***  __The average number of steps per day is `r dayMean` and the median number of steps per day is `r dayMedian`.__
+
