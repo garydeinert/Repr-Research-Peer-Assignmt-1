@@ -19,7 +19,10 @@ my.dataframe <- read.csv("activity.csv",header = TRUE)
       dayMean <- format(mean(dayTotal$x, na.rm = TRUE), digits=2, nsmall = 2)
       dayMedian <- median(dayTotal$x, na.rm = TRUE)
 
-hist(dayTotal$x, main = "Histogram of Daily Walking Totals", xlab = "Daily Steps")
+hist(dayTotal$x, 
+     main = "Histogram of Daily Walking Totals", 
+     xlab = "Daily Steps",
+     col = "blue")
 
 ```
 
@@ -50,9 +53,9 @@ plot(myAvgs$Interval, myAvgs$x,
 
 ``` {r Imputing NAs}
 
-sum(is.na(my.dataframe$steps))                  ## count the number of NA's
-new.dataframe <- my.dataframe                   ## create the new dataset equal to the old, to fill in
-                                                ## replace the NA's with overall timeinterval mean
+sum(is.na(my.dataframe$steps))      ## count the number of NA's
+new.dataframe <- my.dataframe       ## create the new dataset equal to the old, to fill in
+                                    ## replace the NA's with overall timeinterval mean
 suppressWarnings(
 new.dataframe$steps[is.na(new.dataframe$steps)] <- myAvgs$x[myAvgs$Interval == new.dataframe$interval])
 
@@ -60,9 +63,10 @@ new.dataframe$steps[is.na(new.dataframe$steps)] <- myAvgs$x[myAvgs$Interval == n
       newMean <- format(mean(newTotal$x, na.rm = TRUE), digits=2, nsmall = 2)
       newMedian <- format(median(newTotal$x, na.rm = TRUE), digits = 1, nsmall = 0)
 
-hist(newTotal$x, main = "Updated Histogram of Daily Walking Totals", xlab = "Daily Steps, NA Imputed to Mean")
-
-
+hist(newTotal$x, 
+     main = "Updated Histogram of Daily Walking Totals", 
+     xlab = "Daily Steps, NA Imputed to Mean",
+     col = "green")
 ```
    
 ***  __The average number of steps per day is `r newMean` and the median number of steps per day is `r newMedian`.  Compare to the prior average steps per day at `r dayMean` and previous median of `r dayMedian`.   We conclude that imputing values by the interval mean for this dataset does not significantly change the results.__   
@@ -76,8 +80,34 @@ weekly.dataframe <- cbind(weekly.dataframe, day = weekdays(as.Date(weekly.datafr
 
 weekly.dataframe$day <- gsub("S..","ddd",weekly.dataframe$day)    ##  Change weekend days to "ddd"
 weekly.dataframe$partofweek <- as.character(weekly.dataframe$partofweek)  ## r requires conversion
-x <- which(weekly.dataframe$day == 'ddd')                   ## find weekend days
+x <- which(weekly.dataframe$day == 'ddd')                                 ## find weekend days
 weekly.dataframe$partofweek[x] <- "Weekend"                               ## from factor to char
 weekly.dataframe$partofweek <- as.factor(weekly.dataframe$partofweek)     ## then convert back
 weekly.dataframe$day <- NULL       ## strip weekday variable
 
+##  find weekday averages and weekend averages
+weekdays <- weekly.dataframe[weekly.dataframe$partofweek == "Weekday",]
+weekdayAvgs <- round(aggregate(weekdays$steps, 
+                  list(interval = weekdays$interval), 
+                  mean), 0)
+
+weekends <- weekly.dataframe[weekly.dataframe$partofweek == "Weekend",]
+weekendAvgs <- round(aggregate(weekends$steps,
+                  list(interval = weekends$interval),
+                  mean), 0)
+
+par(mfrow = c(2,1))
+
+plot(weekdays$interval,
+     weekdays$steps, 
+     type="l",
+     main = "Weekdays",
+     xlab="Time Interval",
+     ylab="Steps")
+
+plot(weekends$interval,
+     weekends$steps, 
+     type="l",
+     main = "Weekends",
+     xlab="Time Interval",
+     ylab="Steps")
