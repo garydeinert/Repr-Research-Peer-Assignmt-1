@@ -7,14 +7,14 @@ output: html_document
 
 ### Part 1.  Loading and preprocessing the data.  
 
-```{r}
+```{r Load and Preprocess}
 setwd("//GARY-LAPTOP/Users/Gary/Desktop/Data Science Specialzation/Repr Research Peer Assignmt 1")
 my.dataframe <- read.csv("activity.csv",header = TRUE)
 
 ```
 ### Part 2.  What is the mean total number of steps taken per day? 
 
-```{r}
+```{r Mean Daily Totals}
       dayTotal <- aggregate(my.dataframe$steps, list(Date = my.dataframe$date), sum)
       dayMean <- format(mean(dayTotal$x, na.rm = TRUE), digits=2, nsmall = 2)
       dayMedian <- median(dayTotal$x, na.rm = TRUE)
@@ -28,7 +28,7 @@ hist(dayTotal$x, main = "Histogram of Daily Walking Totals", xlab = "Daily Steps
 
 ### Part 3.  What is the average daily activity pattern?  
 
-```{r}
+```{r Averages Thru The Day}
 myAvgs <- round(aggregate(my.dataframe$steps, 
                   list(Interval = my.dataframe$interval), 
                   mean, 
@@ -48,7 +48,7 @@ plot(myAvgs$Interval, myAvgs$x,
    
 ### Part 4. Imputing missing values.
 
-``` {r}
+``` {r Imputing NAs}
 
 sum(is.na(my.dataframe$steps))                  ## count the number of NA's
 new.dataframe <- my.dataframe                   ## create the new dataset equal to the old, to fill in
@@ -60,14 +60,24 @@ new.dataframe$steps[is.na(new.dataframe$steps)] <- myAvgs$x[myAvgs$Interval == n
       newMean <- format(mean(newTotal$x, na.rm = TRUE), digits=2, nsmall = 2)
       newMedian <- format(median(newTotal$x, na.rm = TRUE), digits = 1, nsmall = 0)
 
-hist(newTotal$x, main = "Updated Histogram of Daily Walking Totals", xlab = "Daily Steps")
+hist(newTotal$x, main = "Updated Histogram of Daily Walking Totals", xlab = "Daily Steps, NA Imputed to Mean")
 
 
 ```
    
-***  __The average number of steps per day is `r newMean` and the median number of steps per day is `r newMedian`.  Compare to the prior average steps per day at `r dayMean` and previous median of `r dayMedian`.   We conclude that the impact of imputing values by the interval mean does not significantly change the results.__   
+***  __The average number of steps per day is `r newMean` and the median number of steps per day is `r newMedian`.  Compare to the prior average steps per day at `r dayMean` and previous median of `r dayMedian`.   We conclude that imputing values by the interval mean for this dataset does not significantly change the results.__   
 
 ### Part 5.  Are there differences in activity patterns between weekdays and weekends?
 
+```{r Weekends vs Weekdays}
 
+weekly.dataframe <- cbind(new.dataframe, partofweek = "Weekday")  ## default all days to weekday
+weekly.dataframe <- cbind(weekly.dataframe, day = weekdays(as.Date(weekly.dataframe$date),abbreviate = TRUE))
+
+weekly.dataframe$day <- gsub("S..","ddd",weekly.dataframe$day)    ##  Change weekend days to "ddd"
+weekly.dataframe$partofweek <- as.character(weekly.dataframe$partofweek)  ## r requires conversion
+x <- which(weekly.dataframe$day == 'ddd')                   ## find weekend days
+weekly.dataframe$partofweek[x] <- "Weekend"                               ## from factor to char
+weekly.dataframe$partofweek <- as.factor(weekly.dataframe$partofweek)     ## then convert back
+weekly.dataframe$day <- NULL       ## strip weekday variable
 
