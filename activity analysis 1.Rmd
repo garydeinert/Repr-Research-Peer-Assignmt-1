@@ -16,10 +16,10 @@ my.dataframe <- read.csv("activity.csv",header = TRUE)
 
 ```{r}
       dayTotal <- aggregate(my.dataframe$steps, list(Date = my.dataframe$date), sum)
-      dayMean <- format(mean(dayTotal$x, na.rm = TRUE), nsmall = 2)
+      dayMean <- format(mean(dayTotal$x, na.rm = TRUE), digits=2, nsmall = 2)
       dayMedian <- median(dayTotal$x, na.rm = TRUE)
 
-hist(dayTotal$x, main = "Histogram of Daily Walking Totals", xlab = "Daily Steps per Day")
+hist(dayTotal$x, main = "Histogram of Daily Walking Totals", xlab = "Daily Steps")
 
 ```
 
@@ -29,10 +29,11 @@ hist(dayTotal$x, main = "Histogram of Daily Walking Totals", xlab = "Daily Steps
 ### Part 3.  What is the average daily activity pattern?  
 
 ```{r}
-myAvgs <- aggregate(my.dataframe$steps, 
-            list(Interval = my.dataframe$interval), 
-            mean, 
-            na.rm = TRUE)
+myAvgs <- round(aggregate(my.dataframe$steps, 
+                  list(Interval = my.dataframe$interval), 
+                  mean, 
+                  na.rm = TRUE), 0)
+
 maxInt <- subset(myAvgs,x == max(myAvgs$x))            ##  Find the maximum average time interval 
 
 plot(myAvgs$Interval, myAvgs$x, 
@@ -43,4 +44,30 @@ plot(myAvgs$Interval, myAvgs$x,
 
 ```
    
-*** __The maximum average daily steps was in time interval `r maxInt$Interval` with `r format(maxInt$x, digits = 2, nsmall = 2)` average steps.__   
+*** __The maximum average daily steps was in time interval `r maxInt$Interval` with `r round(maxInt$x, 0)` average steps.__  
+   
+### Part 4. Imputing missing values.
+
+``` {r}
+
+sum(is.na(my.dataframe$steps))                  ## count the number of NA's
+new.dataframe <- my.dataframe                   ## create the new dataset equal to the old, to fill in
+                                                ## replace the NA's with overall timeinterval mean
+suppressWarnings(
+new.dataframe$steps[is.na(new.dataframe$steps)] <- myAvgs$x[myAvgs$Interval == new.dataframe$interval])
+
+      newTotal <- aggregate(new.dataframe$steps, list(Date = new.dataframe$date), sum)
+      newMean <- format(mean(newTotal$x, na.rm = TRUE), digits=2, nsmall = 2)
+      newMedian <- format(median(newTotal$x, na.rm = TRUE), digits = 1, nsmall = 0)
+
+hist(newTotal$x, main = "Updated Histogram of Daily Walking Totals", xlab = "Daily Steps")
+
+
+```
+   
+***  __The average number of steps per day is `r newMean` and the median number of steps per day is `r newMedian`.  Compare to the prior average steps per day at `r dayMean` and previous median of `r dayMedian`.   We conclude that the impact of imputing values by the interval mean does not significantly change the results.__   
+
+### Part 5.  Are there differences in activity patterns between weekdays and weekends?
+
+
+
